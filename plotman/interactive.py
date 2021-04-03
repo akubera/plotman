@@ -6,10 +6,10 @@ import subprocess
 import threading
 import yaml
 
-from job import Job
-import archive
-import manager
-import reporting
+from .job import Job
+from . import archive
+from . import manager
+from . import reporting
 
 class Log:
     def __init__(self):

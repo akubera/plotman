@@ -2,11 +2,11 @@ import texttable as tt   # from somewhere?
 import os
 import psutil
 
-import archive
-import job
-import manager
+from . import archive
+from . import job
+from . import manager
 import math
-import plot_util
+from . import plot_util
 
 def abbr_path(path, putative_prefix):
     if putative_prefix and path.startswith(putative_prefix):

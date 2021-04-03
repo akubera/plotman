@@ -15,9 +15,9 @@ import subprocess
 import sys
 
 # Plotman libraries
-import job
-import plot_util
-import archive # for get_archdir_freebytes(). TODO: move to avoid import loop
+from . import job
+from . import plot_util
+from . import archive # for get_archdir_freebytes(). TODO: move to avoid import loop
 
 # Constants
 MIN = 60    # Seconds
