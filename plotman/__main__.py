@@ -1,4 +1,6 @@
-#!/usr/bin/python3
+"""
+Main executable script
+"""
 
 from datetime import datetime
 from subprocess import call
@@ -21,6 +23,7 @@ import interactive
 import manager
 import plot_util
 import reporting
+
 
 class PlotmanArgParser:
     def add_idprefix_arg(self, subparser):
@@ -71,7 +74,9 @@ class PlotmanArgParser:
         return args
 
 
-if __name__ == "__main__":
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv[1:]
     random.seed()
 
     pm_parser = PlotmanArgParser()
@@ -196,3 +201,6 @@ if __name__ == "__main__":
                     print('Resuming ' + job.plot_id)
                     job.resume()
 
+
+if __name__ == "__main__":
+    sys.exit(main())
