@@ -25,53 +25,49 @@ import plot_util
 import reporting
 
 
-class PlotmanArgParser:
-    def add_idprefix_arg(self, subparser):
+def arg_parser():
+    def add_idprefix_arg(subparser):
         subparser.add_argument(
                 'idprefix',
                 type=str,
                 nargs='+',
                 help='disambiguating prefix of plot ID')
 
-    def parse_args(self):
-        parser = argparse.ArgumentParser(description='Chia plotting manager.')
-        sp = parser.add_subparsers(dest='cmd')
+    parser = argparse.ArgumentParser(description='Chia plotting manager.')
+    sp = parser.add_subparsers(dest='cmd')
 
-        p_status = sp.add_parser('status', help='show current plotting status')
- 
-        p_dirs = sp.add_parser('dirs', help='show directories info')
+    p_status = sp.add_parser('status', help='show current plotting status')
 
-        p_interactive = sp.add_parser('interactive', help='run interactive control/montioring mode')
+    p_dirs = sp.add_parser('dirs', help='show directories info')
 
-        p_dst_sch = sp.add_parser('dsched', help='print destination dir schedule')
+    p_interactive = sp.add_parser('interactive', help='run interactive control/montioring mode')
 
-        p_plot = sp.add_parser('plot', help='run plotting loop')
+    p_dst_sch = sp.add_parser('dsched', help='print destination dir schedule')
 
-        p_archive = sp.add_parser('archive',
-                help='move completed plots to farming location')
+    p_plot = sp.add_parser('plot', help='run plotting loop')
 
-        p_details = sp.add_parser('details', help='show details for job')
-        self.add_idprefix_arg(p_details)
+    p_archive = sp.add_parser('archive',
+            help='move completed plots to farming location')
 
-        p_files = sp.add_parser('files', help='show temp files associated with job')
-        self.add_idprefix_arg(p_files)
+    p_details = sp.add_parser('details', help='show details for job')
+    add_idprefix_arg(p_details)
 
-        p_kill = sp.add_parser('kill', help='kill job (and cleanup temp files)')
-        self.add_idprefix_arg(p_kill)
+    p_files = sp.add_parser('files', help='show temp files associated with job')
+    add_idprefix_arg(p_files)
 
-        p_suspend = sp.add_parser('suspend', help='suspend job')
-        self.add_idprefix_arg(p_suspend)
+    p_kill = sp.add_parser('kill', help='kill job (and cleanup temp files)')
+    add_idprefix_arg(p_kill)
 
-        p_resume = sp.add_parser('resume', help='resume suspended job')
-        self.add_idprefix_arg(p_resume)
+    p_suspend = sp.add_parser('suspend', help='suspend job')
+    add_idprefix_arg(p_suspend)
 
-        p_analyze = sp.add_parser('analyze',
-                help='analyze timing stats of completed jobs')
-        p_analyze.add_argument('logfile', type=str, nargs='+',
-                help='logfile(s) to analyze')
+    p_resume = sp.add_parser('resume', help='resume suspended job')
+    add_idprefix_arg(p_resume)
 
-        args = parser.parse_args()
-        return args
+    p_analyze = sp.add_parser('analyze', help='analyze timing stats of completed jobs')
+    p_analyze.add_argument('logfile', type=str, nargs='+', help='logfile(s) to analyze')
+
+    return parser
 
 
 def main(argv=None):
@@ -79,8 +75,7 @@ def main(argv=None):
         argv = sys.argv[1:]
     random.seed()
 
-    pm_parser = PlotmanArgParser()
-    args = pm_parser.parse_args()
+    args = arg_parser().parse_args(argv)
     
     with open('config.yaml', 'r') as ymlfile:
         cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
