@@ -16,13 +16,13 @@ import time
 import yaml
 
 # Plotman libraries
-from job import Job
-import analyzer
-import archive
-import interactive
-import manager
-import plot_util
-import reporting
+from .job import Job
+from .analyzer import LogAnalyzer
+from . import archive
+from . import interactive
+from . import manager
+from . import plot_util
+from . import reporting
 
 
 def arg_parser():
@@ -102,7 +102,7 @@ def main(argv=None):
     # Analysis of completed jobs
     #
     elif args.cmd == 'analyze':
-        analyzer = analyzer.LogAnalyzer()
+        analyzer = LogAnalyzer()
         analyzer.analyze(args.logfile)
 
     else:
