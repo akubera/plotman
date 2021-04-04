@@ -5,8 +5,7 @@ plotting operations.  The tool runs on the plotting machine and provides
 the following functionality:
 
 - Automatic spawning of new plotting jobs, possibly overlapping ("staggered")
-  on multiple temp directories, rate-limited globally and by per-temp-dir
-limits.
+  on multiple temp directories, rate-limited globally and by per-temp-dir limits.
 
 - Rsync'ing of newly generated plots to a remote host (a farmer/harvester),
   called "archiving".
@@ -26,15 +25,15 @@ Plotman is designed for the following configuration:
 
 - A plotting machine with an array of `tmp` dirs, a single `tmp2` dir, and an
   array of `dst` dirs to which the plot jobs plot.  The `dst` dirs serve as a
-temporary buffer space for generated plots.
+  temporary buffer space for generated plots.
 
 - A farming machine with a large number of drives, made accessible via an
   `rsyncd` module, and to be entirely populated with plots.  These are known as
-the `archive` directories.
+  the `archive` directories.
 
 - Plot jobs are run with STDOUT/STDERR redirected to a log file in a configured
-directory.  This allows analysis of progress (plot phase) as well as timing
-(e.g. for analyzing performance).
+  directory.  This allows analysis of progress (plot phase) as well as timing
+  (e.g. for analyzing performance).
 
 ## Functionality
 
