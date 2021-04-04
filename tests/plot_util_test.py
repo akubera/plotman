@@ -3,13 +3,13 @@
 # from unittest.mock import patch
 from pyfakefs.fake_filesystem_unittest import TestCase
 
-from plot_util import GB
+from plotman.plot_util import GB
 
 import os
 import pyfakefs
 import unittest
 
-import plot_util
+from plotman import plot_util
 
 class TestPlotUtil(unittest.TestCase):
     def test_human_format(self):

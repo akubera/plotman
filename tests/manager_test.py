@@ -2,8 +2,8 @@
 
 from unittest.mock import patch
 import unittest
-import manager
-import job
+from plotman import manager
+
 
 class TestManager(unittest.TestCase):
     def setUp(self):
@@ -12,14 +12,14 @@ class TestManager(unittest.TestCase):
                 'tmpdir_stagger_phase_minor': 0,
                 'tmpdir_max_jobs': 3 }
 
-    @patch('job.Job')
+    @patch('plotman.job.Job')
     def job_w_tmpdir_phase(self, tmpdir, phase, MockJob):
         j = MockJob()
         j.progress.return_value = phase
         j.tmpdir = tmpdir
         return j
 
-    @patch('job.Job')
+    @patch('plotman.job.Job')
     def job_w_dstdir_phase(self, dstdir, phase, MockJob):
         j = MockJob()
         j.progress.return_value = phase

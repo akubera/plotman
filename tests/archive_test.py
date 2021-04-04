@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 from unittest.mock import patch
-
 import unittest
-import archive
-import manager
+
+from plotman import archive
+from plotman import manager
 
 class TestArchive(unittest.TestCase):
     def test_compute_priority(self):

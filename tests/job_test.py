@@ -2,8 +2,8 @@
 
 from unittest.mock import patch
 import unittest
-import manager
-import job
+from plotman import manager
+from plotman import job
 
 class TestJob(unittest.TestCase):
     def setUp(self):

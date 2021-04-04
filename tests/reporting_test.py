@@ -6,7 +6,8 @@ import os
 import pyfakefs
 import unittest
 
-import reporting
+from plotman import reporting
+
 
 class TestReporting(unittest.TestCase):
     def test_phases_str(self):
@@ -21,7 +22,7 @@ class TestReporting(unittest.TestCase):
         self.assertEqual('1        2        3       4 ',
             reporting.job_viz([]) )
 
-    @patch('job.Job')
+    @patch('plotman.job.Job')
     def job_w_phase(self, ph, MockJob):
         j = MockJob()
         j.progress.return_value = ph
@@ -58,4 +59,3 @@ class TestReporting(unittest.TestCase):
 
         self.assertEqual('1        2  .:;!  3 !     4 ',
             reporting.job_viz(jobs))
-
