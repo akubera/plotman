@@ -16,7 +16,6 @@ import readline          # For nice CLI
 import sys
 import time
 from pathlib import Path
-import yaml
 import appdirs
 
 # Plotman libraries
@@ -133,7 +132,13 @@ class Configuration:
                 return cls.from_file(f)
 
         if fp.name.endswith('.yaml'):
+            import yaml
+
             cfg = yaml.load(fp, Loader=yaml.FullLoader)
+        elif fp.name.endswith('.json'):
+            import json
+
+            cfg = json.load(fp)
         else:
             raise NotImplementedError(
                 f'Cannot load configuration from {fp.name!r}'
