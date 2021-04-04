@@ -67,6 +67,7 @@ def arg_parser():
     add_idprefix_arg(p_resume)
 
     p_analyze = sp.add_parser('analyze', help='analyze timing stats of completed jobs')
+    p_analyze.set_defaults(func=main_analyze)
     p_analyze.add_argument('logfile', type=str, nargs='+', help='logfile(s) to analyze')
 
     return parser
@@ -98,17 +99,10 @@ def main(argv=None):
     #
     # Stay alive, spawning plot jobs
     #
-    if args.cmd == 'plot':
-        main_plot(dir_cfg, sched_cfg, plotting_cfg)
- 
     #
     # Analysis of completed jobs
     #
-    elif args.cmd == 'analyze':
-        analyzer = LogAnalyzer()
-        analyzer.analyze(args.logfile)
-
-    else:
+    if True:
         # print('...scanning process tables')
         jobs = Job.get_running_jobs(dir_cfg['log'])
 
@@ -220,6 +214,12 @@ def main_status(args, cfg):
     jobs = Job.get_running_jobs(dir_cfg['log'])
     (rows, columns) = os.popen('stty size', 'r').read().split()
     print(reporting.status_report(jobs, int(columns)))
+    return 0
+
+
+def main_analyze(args, cfg):
+    analyzer = LogAnalyzer()
+    analyzer.analyze(args.logfile)
     return 0
 
 
