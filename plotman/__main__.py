@@ -29,12 +29,6 @@ from . import plot_util
 from . import reporting
 
 
-user_config_path = Path(
-    os.environ.get('PLOTMAN_CFG_PATH')
-    or f'{appdirs.user_config_dir("plotman")}/config.yaml'
-)
-
-
 def arg_parser():
     def add_idprefix_arg(subparser):
         subparser.add_argument(
@@ -49,8 +43,7 @@ def arg_parser():
         '-c',
         '--config',
         nargs='?',
-        type=argparse.FileType('r'),
-        default=user_config_path,
+        type=Path,
         help='Use configuration file',
     )
     sp = parser.add_subparsers(dest='cmd')
@@ -133,8 +126,9 @@ class Configuration:
         return self.data['directories']['log']
 
     @classmethod
-    def from_file(cls, fp: Union[str, TextIOWrapper]):
-        if isinstance(fp, str):
+    def from_file(cls, fp: Union[str, Path, TextIOWrapper]):
+        """Read configuration from data file"""
+        if isinstance(fp, (str, Path)):
             with open(fp, 'r') as f:
                 return cls.from_file(f)
 
@@ -156,7 +150,17 @@ def main(argv=None):
     parser = arg_parser()
     args = parser.parse_args(argv)
 
-    cfg = Configuration.from_file(args.config)
+    cfg_path = (
+        args.config
+        or os.environ.get('PLOTMAN_CFG_PATH')
+        or f'{appdirs.user_config_dir("plotman")}/config.yaml'
+    )
+
+    try:
+        cfg = Configuration.from_file(cfg_path)
+    except OSError as err:
+        print(f'Error opening configuration file: {err}', file=sys.stderr)
+        return 1
 
     try:
         main_func = args.func
