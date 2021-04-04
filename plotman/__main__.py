@@ -37,6 +37,7 @@ def arg_parser():
     sp = parser.add_subparsers(dest='cmd')
 
     p_status = sp.add_parser('status', help='show current plotting status')
+    p_status.set_defaults(func=main_status)
 
     p_dirs = sp.add_parser('dirs', help='show directories info')
 
@@ -45,6 +46,7 @@ def arg_parser():
     p_dst_sch = sp.add_parser('dsched', help='print destination dir schedule')
 
     p_plot = sp.add_parser('plot', help='run plotting loop')
+    p_plot.set_defaults(func=main_plot)
 
     p_archive = sp.add_parser('archive',
             help='move completed plots to farming location')
@@ -75,11 +77,20 @@ def main(argv=None):
         argv = sys.argv[1:]
     random.seed()
 
-    args = arg_parser().parse_args(argv)
+    parser = arg_parser()
+    args = parser.parse_args(argv)
     
     with open('config.yaml', 'r') as ymlfile:
         cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+    
+    try:
+        main_func = args.func
+    except AttributeError:
+        parser.print_help(file=sys.stderr)
+        return 1
 
+    return main_func(args, cfg)
+    
     dir_cfg = cfg['directories']
     sched_cfg = cfg['scheduling']
     plotting_cfg = cfg['plotting']
@@ -103,8 +114,7 @@ def main(argv=None):
 
         # Status report
         if args.cmd == 'status':
-            (rows, columns) = os.popen('stty size', 'r').read().split()
-            print(reporting.status_report(jobs, int(columns)))
+            args.func(jobs)
 
         # Directories report
         elif args.cmd == 'dirs':
@@ -189,7 +199,10 @@ def main(argv=None):
                     job.resume()
 
 
-def main_plot(dir_cfg, sched_cfg, plotting_cfg):
+def main_plot(args, cfg):
+    dir_cfg = cfg['directories']
+    sched_cfg = cfg['scheduling']
+    plotting_cfg = cfg['plotting']
     print('...starting plot loop')
     while True:
         wait_reason = manager.maybe_start_new_plot(dir_cfg, sched_cfg, plotting_cfg)
@@ -200,6 +213,14 @@ def main_plot(dir_cfg, sched_cfg, plotting_cfg):
             print('...sleeping %d s: %s' % (sleep_s, wait_reason))
 
         time.sleep(sleep_s)
+
+
+def main_status(args, cfg):
+    dir_cfg = cfg['directories']
+    jobs = Job.get_running_jobs(dir_cfg['log'])
+    (rows, columns) = os.popen('stty size', 'r').read().split()
+    print(reporting.status_report(jobs, int(columns)))
+    return 0
 
 
 if __name__ == "__main__":
