@@ -79,6 +79,7 @@ def main(argv=None):
     
     with open('config.yaml', 'r') as ymlfile:
         cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+
     dir_cfg = cfg['directories']
     sched_cfg = cfg['scheduling']
     plotting_cfg = cfg['plotting']
@@ -87,17 +88,8 @@ def main(argv=None):
     # Stay alive, spawning plot jobs
     #
     if args.cmd == 'plot':
-        print('...starting plot loop')
-        while True:
-            wait_reason = manager.maybe_start_new_plot(dir_cfg, sched_cfg, plotting_cfg)
-
-            # TODO: report this via a channel that can be polled on demand, so we don't spam the console
-            sleep_s = int(sched_cfg['polling_time_s'])
-            if wait_reason:
-                print('...sleeping %d s: %s' % (sleep_s, wait_reason))
-
-            time.sleep(sleep_s)
-    
+        main_plot(dir_cfg, sched_cfg, plotting_cfg)
+ 
     #
     # Analysis of completed jobs
     #
@@ -195,6 +187,19 @@ def main(argv=None):
                 elif args.cmd == 'resume':
                     print('Resuming ' + job.plot_id)
                     job.resume()
+
+
+def main_plot(dir_cfg, sched_cfg, plotting_cfg):
+    print('...starting plot loop')
+    while True:
+        wait_reason = manager.maybe_start_new_plot(dir_cfg, sched_cfg, plotting_cfg)
+
+        # TODO: report this via a channel that can be polled on demand, so we don't spam the console
+        sleep_s = int(sched_cfg['polling_time_s'])
+        if wait_reason:
+            print('...sleeping %d s: %s' % (sleep_s, wait_reason))
+
+        time.sleep(sleep_s)
 
 
 if __name__ == "__main__":
