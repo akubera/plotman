@@ -15,7 +15,8 @@ import random
 import readline          # For nice CLI
 import sys
 import time
-import yaml
+from pathlib import Path
+import appdirs
 
 # Plotman libraries
 from .job import Job
@@ -37,6 +38,13 @@ def arg_parser():
         )
 
     parser = argparse.ArgumentParser(description='Chia plotting manager.')
+    parser.add_argument(
+        '-c',
+        '--config',
+        nargs='?',
+        type=Path,
+        help='Use configuration file',
+    )
     sp = parser.add_subparsers(dest='cmd')
 
     p_status = sp.add_parser('status', help='show current plotting status')
@@ -117,13 +125,20 @@ class Configuration:
         return self.data['directories']['log']
 
     @classmethod
-    def from_file(cls, fp: Union[str, TextIOWrapper]):
-        if isinstance(fp, str):
+    def from_file(cls, fp: Union[str, Path, TextIOWrapper]):
+        """Read configuration from data file"""
+        if isinstance(fp, (str, Path)):
             with open(fp, 'r') as f:
                 return cls.from_file(f)
 
         if fp.name.endswith('.yaml'):
+            import yaml
+
             cfg = yaml.load(fp, Loader=yaml.FullLoader)
+        elif fp.name.endswith('.json'):
+            import json
+
+            cfg = json.load(fp)
         else:
             raise NotImplementedError(
                 f'Cannot load configuration from {fp.name!r}'
@@ -140,7 +155,17 @@ def main(argv=None):
     parser = arg_parser()
     args = parser.parse_args(argv)
 
-    cfg = Configuration.from_file('config.yaml')
+    cfg_path = (
+        args.config
+        or os.environ.get('PLOTMAN_CFG_PATH')
+        or f'{appdirs.user_config_dir("plotman")}/config.yaml'
+    )
+
+    try:
+        cfg = Configuration.from_file(cfg_path)
+    except OSError as err:
+        print(f'Error opening configuration file: {err}', file=sys.stderr)
+        return 1
 
     try:
         main_func = args.func
