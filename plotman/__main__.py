@@ -15,7 +15,9 @@ import random
 import readline          # For nice CLI
 import sys
 import time
+from pathlib import Path
 import yaml
+import appdirs
 
 # Plotman libraries
 from .job import Job
@@ -25,6 +27,12 @@ from . import interactive
 from . import manager
 from . import plot_util
 from . import reporting
+
+
+user_config_path = Path(
+    os.environ.get('PLOTMAN_CFG_PATH')
+    or f'{appdirs.user_config_dir("plotman")}/config.yaml'
+)
 
 
 def arg_parser():
@@ -37,6 +45,14 @@ def arg_parser():
         )
 
     parser = argparse.ArgumentParser(description='Chia plotting manager.')
+    parser.add_argument(
+        '-c',
+        '--config',
+        nargs='?',
+        type=argparse.FileType('r'),
+        default=user_config_path,
+        help='Use configuration file',
+    )
     sp = parser.add_subparsers(dest='cmd')
 
     p_status = sp.add_parser('status', help='show current plotting status')
@@ -140,7 +156,7 @@ def main(argv=None):
     parser = arg_parser()
     args = parser.parse_args(argv)
 
-    cfg = Configuration.from_file('config.yaml')
+    cfg = Configuration.from_file(args.config)
 
     try:
         main_func = args.func
