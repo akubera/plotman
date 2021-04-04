@@ -1,8 +1,10 @@
 """
 Main executable script
 """
+from typing import Union
 
 from datetime import datetime
+from io import TextIOWrapper
 from subprocess import call
 
 import argparse
@@ -81,6 +83,37 @@ def arg_parser():
     return parser
 
 
+class Configuration:
+
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def directories(self):
+        return self.data['directories']
+
+    @property
+    def scheduling(self):
+        return self.data['scheduling']
+
+    @property
+    def plotting(self):
+        return self.data['plotting']
+
+    @classmethod
+    def from_file(cls, fp: Union[str, TextIOWrapper]):
+        if isinstance(fp, str):
+            with open(fp, 'r') as f:
+                return cls.from_file(f)
+            
+        if fp.name.endswith(".yaml"):
+            cfg = yaml.load(fp, Loader=yaml.FullLoader)
+        else:
+            raise NotImplementedError(f"Cannot load configuration from {fp.name!r}")
+
+        return cls(cfg)
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
@@ -88,17 +121,16 @@ def main(argv=None):
 
     parser = arg_parser()
     args = parser.parse_args(argv)
-    
-    with open('config.yaml', 'r') as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-    
+
+    cfg = Configuration.from_file("config.yaml")
+
     try:
         main_func = args.func
     except AttributeError:
         parser.print_help(file=sys.stderr)
         return 1
 
-    return main_func(args, cfg)
+    return main_func(args, cfg.data)
     
 
 def main_plot(args, cfg):
