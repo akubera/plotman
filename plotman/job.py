@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from typing import List
+
 # TODO do we use all these?
 from datetime import datetime
 from enum import Enum, auto
@@ -56,7 +58,8 @@ class Job:
     # These are dynamic, cached, and need to be udpated periodically
     phase = (None, None)   # Phase/subphase
 
-    def get_running_jobs(logroot, cached_jobs=()):
+    @classmethod
+    def get_running_jobs(cls, logroot, cached_jobs=()) -> List['Job']:
         '''Return a list of running plot jobs.  If a cache of preexisting jobs is provided,
            reuse those previous jobs without updating their information.  Always look for
            new jobs not already in the cache.'''
@@ -71,7 +74,7 @@ class Job:
                     if proc.pid in cached_jobs_by_pid.keys():
                         jobs.append(cached_jobs_by_pid[proc.pid])  # Copy from cache
                     else:
-                        jobs.append(Job(proc, logroot))
+                        jobs.append(cls(proc, logroot))
 
         return jobs
 
